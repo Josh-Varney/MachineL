@@ -19,10 +19,12 @@ end_timestamp = int(end_date.timestamp())
 # Get historical market chart data
 historical_data = cg.get_coin_market_chart_range_by_id(id=coin_id, vs_currency=vs_currency, from_timestamp=start_timestamp, to_timestamp=end_timestamp)
 
+
 # Extracting prices and timestamps
 prices = historical_data['prices']
 timestamps = [datetime.utcfromtimestamp(timestamp[0]/1000).strftime('%Y-%m-%d %H:%M:%S') for timestamp in prices]
-
+                # Converts into seconds and converts into the following format
+                
 # Print the results
 for timestamp, price in zip(timestamps, prices):
     print(f"Date: {timestamp}, Price: {price[1]} {vs_currency}")
