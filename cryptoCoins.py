@@ -1,5 +1,6 @@
 from pycoingecko import CoinGeckoAPI
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 cg = CoinGeckoAPI()
 
@@ -28,3 +29,13 @@ timestamps = [datetime.utcfromtimestamp(timestamp[0]/1000).strftime('%Y-%m-%d %H
 # Print the results
 for timestamp, price in zip(timestamps, prices):
     print(f"Date: {timestamp}, Price: {price[1]} {vs_currency}")
+    
+
+plt.plot(historical_data['prices'], label='Actual Prices')
+plt.title(f'{coin_id} Price Over Time')
+plt.xlabel('Date')
+plt.ylabel('Prices')
+plt.legend()
+plt.show()
+
+
