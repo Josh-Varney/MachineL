@@ -9,12 +9,12 @@ from sklearn.metrics import mean_squared_error
 cg = CoinGeckoAPI()
 
 def get_historical_data(coin_id, vs_currency, start_date, end_date):
-    start_timestamp = int(start_date.timestamp())
+    start_timestamp = int(start_date.timestamp()) # Builds timestamp
     end_timestamp = int(end_date.timestamp())
     historical_data = cg.get_coin_market_chart_range_by_id(id=coin_id, vs_currency=vs_currency, from_timestamp=start_timestamp, to_timestamp=end_timestamp)
     prices = historical_data['prices']
     timestamps = [datetime.utcfromtimestamp(timestamp[0]/1000).strftime('%Y-%m-%d %H:%M:%S') for timestamp in prices]
-    # Converts into seconds and converts into the following format
+    # Converts into seconds and converts into the timestamp format to desired time 
     return timestamps, prices
 
 # Define the coin id and currency
