@@ -3,54 +3,55 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, accuracy_score, f1_score
 
-# Specify the stock symbol and the date range
-company = 'GOOGL'
+company = 'HON'
 start_date = '2022-01-01'
 end_date = '2022-12-31'
 
-# Fetch historical stock prices
-stock_data = yf.download(company, start=start_date, end=end_date)  # Fetches stocks between start-end date
+stock_data = yf.download(company, start=start_date, end=end_date)  # Historical Data Collection
 
 # Visualize the actual stock prices over time
-plt.plot(stock_data['Close'], label='Actual Prices')  # Closing Price
-plt.title(f'{company} Stock Prices Over Time')
-plt.xlabel('Date')
-plt.ylabel('Closing Prices')
-plt.legend()
-plt.show()
+# Closing price: end of day value(traders (interest rates and inflation) and investors (commodities being bought))
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 8))
+ax1.plot(stock_data['Close'], label='Actual Prices', linestyle='-') # Plots stock_data (closing prices) over tiem 
+ax1.set_title(f'{company} Stock Prices Over Time') 
+ax1.set_xlabel('Date')
+ax1.set_ylabel('Closing Prices')
+ax1.legend(loc='lower left')
 
-# Extract target and organises the data
-stock_data['Days'] = np.arange(1, len(stock_data) + 1)
-print(stock_data)
-X = stock_data[['Days']]
-y = stock_data['Close']
+stock_data['Days'] = np.arange(1, len(stock_data) + 1)   # Evenly Spaced Values for Usage
+X = stock_data[['Days', 'Open', 'High', 'Low']]  # Multilinear Regression (Multitude of variables) : Opening Prices, High Prices : Low Prices
+y = stock_data['Close'] 
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) # 20% as test set and 80% as training set
-                                                                                        # 42 is the seed                                            
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)  # arbitutuary value (ensure values are consistent)
 
-# Initialize and train the linear regression model
+scalar = StandardScaler()  
+
+X_train_scaled = scalar.fit_transform(X_train)  # Standardise data for best practice
+X_test_scaled = scalar.transform(X_test)
+
 model = LinearRegression()
-model.fit(X_train, y_train) # Dats and Closing Stock Prices
+model.fit(X_train_scaled, y_train)  # Train the model
 
-# Make predictions on the test set
-y_pred = model.predict(X_test)
+y_pred = model.predict(X_test_scaled) # Prediction
 
 # Visualize the regression line
-plt.plot(X_test, y_test, label='Actual Prices')
-plt.plot(X_test, y_pred, color='red', linewidth=3, label='Predicted Prices')
-plt.title(f'{company} Stock Prices Prediction')
-plt.xlabel('Days')
-plt.ylabel('Closing Prices')
-plt.legend()
+ax2.scatter(X_test['Days'], y_test, color='blue', label='Actual Prices')
+ax2.scatter(X_test['Days'], y_pred, color='red', label='Predicted Prices')
+ax2.set_title(f'{company} Stock Prices Prediction (Multilinear Regression)')
+ax2.set_xlabel('Days')
+ax2.set_ylabel('Closing Prices')
+ax2.legend(loc='lower left')
+
+plt.tight_layout()
+
 plt.show()
 
 # Evaluate the model
-mse = mean_squared_error(y_test, y_pred) # Measure of the model's accuracy, where a lower MSE indicates better performance.
-print(f"Mean Squared Error: {mse:.2f}")
+mse = mean_squared_error(y_test, y_pred)  # If low then accuracy is good (amount of error in model) Actual - predicted = Error^2 = ANS/Total
+print(f"Mean Squared Error: {mse:.2f}")   # (squared diff between predicted and actual)
+                                                # sensitivity to outliers value
 
-
-# Linear Regression: Predictions of a variable on another variable
